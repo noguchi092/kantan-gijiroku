@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#102a43">
+  <meta name="description" content="録音、文字起こし、要約をその場だけで完結できる使い捨て議事録ツール「捨て録」です。">
+  <title>捨て録｜使い捨て議事録ツール</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23102a43'/%3E%3Crect x='24' y='11' width='16' height='28' rx='8' fill='%23fff'/%3E%3Cpath d='M17 31a15 15 0 0 0 30 0M32 46v8M24 54h16' fill='none' stroke='%235ad6c7' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="捨て録 ホーム">
+      <span class="brand-mark" aria-hidden="true">音</span>
+      <span>捨て録</span>
+    </a>
+    <div class="privacy"><span class="privacy-dot"></span>データは保存されません</div>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">使い捨ての議事録ツール</p>
+        <h1 id="page-title">録音して、まとめる。<br>会議が終われば持ち帰れる。</h1>
+      </div>
+      <p class="intro-note">録音・文字起こし・要約を、この画面ひとつで。<br>必要な内容を保存したら、最後にすべて削除できます。</p>
+    </section>
+
+    <section class="recorder-card" aria-labelledby="record-title">
+      <div class="meeting-row">
+        <label for="meetingTitle">会議名</label>
+        <input id="meetingTitle" type="text" placeholder="例：9月度 工程打ち合わせ" autocomplete="off">
+      </div>
+
+      <div class="record-panel">
+        <div class="record-status">
+          <span id="pulse" class="status-orb" aria-hidden="true"></span>
+          <div>
+            <p id="record-title" class="status-label">録音の準備ができています</p>
+            <p id="timer" class="timer" aria-live="polite">00:00:00</p>
+          </div>
+        </div>
+        <div class="record-actions">
+          <button id="recordBtn" class="btn btn-record" type="button">
+            <span class="mic-icon" aria-hidden="true"></span><span id="recordBtnText">録音を開始</span>
+          </button>
+          <button id="pauseBtn" class="btn btn-secondary" type="button" disabled>一時停止</button>
+          <button id="stopBtn" class="btn btn-dark" type="button" disabled>録音を終了</button>
+        </div>
+      </div>
+      <p id="supportNote" class="support-note">初回のみ、マイクの使用を許可してください。</p>
+    </section>
+
+    <section class="workspace" aria-label="議事録作成エリア">
+      <article class="editor-card">
+        <div class="card-heading">
+          <div><span class="step">1</span><h2>文字起こし</h2></div>
+          <span id="speechState" class="state-pill">待機中</span>
+        </div>
+        <textarea id="transcript" placeholder="録音を始めると、ここに文字起こしが表示されます。内容はいつでも直接修正できます。" aria-label="文字起こし内容"></textarea>
+        <div class="card-footer">
+          <span id="charCount">0文字</span>
+          <button id="copyTranscript" class="text-button" type="button">全文をコピー</button>
+        </div>
+      </article>
+
+      <article class="editor-card summary-card">
+        <div class="card-heading">
+          <div><span class="step">2</span><h2>議事録の要約</h2></div>
+          <button id="summarizeBtn" class="btn btn-accent" type="button">要約を作る</button>
+        </div>
+        <div id="summary" class="summary-output" contenteditable="true" role="textbox" aria-label="要約内容" data-placeholder="文字起こしの内容から、会議の概要・決定事項・今後の対応を整理します。"></div>
+        <div class="card-footer">
+          <span>作成後に直接修正できます</span>
+          <button id="copySummary" class="text-button" type="button">要約をコピー</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="finish-card" aria-labelledby="finish-title">
+      <div>
+        <p class="eyebrow">会議が終わったら</p>
+        <h2 id="finish-title">必要なものだけ持ち帰る</h2>
+        <p>録音データや議事録を端末に保存したあと、この画面の内容をまとめて削除できます。</p>
+      </div>
+      <div class="finish-actions">
+        <button id="downloadMinutes" class="btn btn-dark" type="button">議事録を保存</button>
+        <button id="downloadAudio" class="btn btn-secondary" type="button" disabled>録音を保存</button>
+        <button id="clearAll" class="btn btn-danger" type="button">すべて削除</button>
+      </div>
+    </section>
+    <footer class="site-footer">© 2026 タイマイオンザライス</footer>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="clearDialog">
+    <form method="dialog" class="dialog-box">
+      <div class="dialog-icon">!</div>
+      <h2>すべて削除しますか？</h2>
+      <p>文字起こし・要約・録音データをこの画面から消去します。削除後は元に戻せません。</p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" value="cancel">キャンセル</button>
+        <button id="confirmClear" class="btn btn-danger" value="confirm">削除する</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
